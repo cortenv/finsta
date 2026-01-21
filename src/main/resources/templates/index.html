@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vibe Image Upload</title>
+    <style>
+        /* Reset some default styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2f3640;
+            margin-bottom: 30px;
+        }
+
+        /* Upload form styling */
+        /* Hide default file input */
+        .upload-form input[type="file"] {
+            display: none;
+        }
+
+        /* Style the label as button */
+        .custom-file-upload {
+            display: inline-block;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            background-color: #0097e6;
+            color: white;
+            font-weight: 500;
+            transition: background 0.3s;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #007bbd;
+        }
+
+        .upload-form input[type="file"] {
+            padding: 10px;
+        }
+
+        .upload-form input[type="text"] {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .upload-form button {
+            padding: 12px;
+            border: none;
+            background-color: #4cd137;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .upload-form button:hover {
+            background-color: #44bd32;
+        }
+
+        /* Images grid */
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+        }
+
+        .image-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .image-card p {
+            padding: 10px 15px;
+            font-size: 14px;
+            color: #2f3640;
+        }
+
+        /* Responsive */
+        @media(max-width: 600px) {
+            .upload-form {
+                padding: 20px;
+            }
+
+            .image-card img {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Vibe Image Upload</h1>
+
+<!-- Upload Form -->
+<form class="upload-form" action="/web/upload" method="post" enctype="multipart/form-data">
+
+    <!-- Custom File Input -->
+    <label class="custom-file-upload">
+        Datei auswählen
+        <input type="file" name="image" required>
+    </label>
+
+    <!-- Show selected file name here -->
+    <span id="file-name" style="margin-left:10px; font-style: italic;"></span>
+
+    <input type="text" name="description" placeholder="Enter description" required>
+    <button type="submit">Upload Image</button>
+</form>
+
+
+<!-- Uploaded Images -->
+<div class="images-grid" th:if="${!images.isEmpty()}">
+    <div class="image-card" th:each="image : ${images}">
+        <img th:src="@{/web/image/{id}(id=${image.id})}" alt="Image">
+        <p th:text="${image.description}">Description</p>
+    </div>
+</div>
+
+<p th:if="${images.isEmpty()}" style="text-align:center; color: #888;">No images uploaded yet.</p>
+
+<script>
+    document.querySelector('input[type="file"]').addEventListener('change', function() {
+        document.getElementById('file-name').textContent = this.files[0].name;
+    });
+</script>
+
+</body>
+</html>
