@@ -2,7 +2,8 @@ package ch.css.vibe.entity;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class ImageEntity {
@@ -22,48 +23,26 @@ public class ImageEntity {
     @Column(columnDefinition = "LONGBLOB")
     private byte[] data;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
+    // Transient field for comments to use in Thymeleaf
+    @Transient
+    private List<Comment> comments = new ArrayList<>();
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getFileName() { return fileName; }
+    public void setFileName(String fileName) { this.fileName = fileName; }
 
-    public String getFileName() {
-        return fileName;
-    }
+    public String getContentType() { return contentType; }
+    public void setContentType(String contentType) { this.contentType = contentType; }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public String getContentType() {
-        return contentType;
-    }
+    public byte[] getData() { return data; }
+    public void setData(byte[] data) { this.data = data; }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
+    public List<Comment> getComments() { return comments; }
+    public void setComments(List<Comment> comments) { this.comments = comments; }
 }

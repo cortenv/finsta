@@ -4,149 +4,82 @@
     <meta charset="UTF-8">
     <title>Vibe Image Upload</title>
     <style>
-        /* Reset some default styles */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin:0; padding:0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f6fa; padding:40px; }
+        h1 { text-align:center; color:#2f3640; margin-bottom:30px; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f6fa;
-            padding: 40px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #2f3640;
-            margin-bottom: 30px;
-        }
-
-        /* Upload form styling */
-        /* Hide default file input */
-        .upload-form input[type="file"] {
-            display: none;
-        }
-
-        /* Style the label as button */
-        .custom-file-upload {
-            display: inline-block;
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 8px;
-            background-color: #0097e6;
-            color: white;
-            font-weight: 500;
-            transition: background 0.3s;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .custom-file-upload:hover {
-            background-color: #007bbd;
-        }
-
-        .upload-form input[type="file"] {
-            padding: 10px;
-        }
-
-        .upload-form input[type="text"] {
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        .upload-form button {
-            padding: 12px;
-            border: none;
-            background-color: #4cd137;
-            color: white;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .upload-form button:hover {
-            background-color: #44bd32;
-        }
+        /* Upload form */
+        .upload-form { max-width:600px; margin:0 auto 50px auto; background:#fff; padding:25px 30px; border-radius:15px; box-shadow:0 4px 20px rgba(0,0,0,0.1); display:flex; flex-direction:column; gap:15px;}
+        .upload-form input[type="file"] { display:none; }
+        .custom-file-upload { display:inline-block; padding:12px 20px; cursor:pointer; border-radius:8px; background:#0097e6; color:white; font-weight:500; text-align:center; transition: background 0.3s; margin-bottom:10px; }
+        .custom-file-upload:hover { background:#007bbd; }
+        .upload-form input[type="text"] { padding:12px; border:1px solid #ccc; border-radius:8px; }
+        .upload-form button { padding:12px; border:none; background:#4cd137; color:white; font-size:16px; border-radius:8px; cursor:pointer; transition:0.3s; }
+        .upload-form button:hover { background:#44bd32; }
 
         /* Images grid */
         .images-grid {
+            max-width: 900px;  /* Adjust as needed */
+            margin: 0 auto;    /* Center container */
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 25px;
+            justify-content: center;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
 
-        .image-card {
-            background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .image-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
 
         .image-card img {
             width: 100%;
-            height: 180px;
+            aspect-ratio: 4 / 3;
             object-fit: cover;
+            display: block;
         }
+        .image-card:hover { transform:translateY(-5px); box-shadow:0 8px 25px rgba(0,0,0,0.15);}
+        .image-card img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; }
+        .image-card p { padding:10px 15px; font-size:14px; color:#2f3640; }
 
-        .image-card p {
-            padding: 10px 15px;
-            font-size: 14px;
-            color: #2f3640;
-        }
-
-        /* Responsive */
-        @media(max-width: 600px) {
-            .upload-form {
-                padding: 20px;
-            }
-
-            .image-card img {
-                height: 150px;
-            }
-        }
+        .comments { border-top:1px solid #eee; margin-top:10px; padding:10px; }
+        .comments h4 { font-size:14px; color:#2f3640; margin-bottom:5px; }
+        .comments p { font-size:13px; color:#555; margin:3px 0; }
     </style>
 </head>
 <body>
 
 <h1>Vibe Image Upload</h1>
 
-<!-- Upload Form -->
 <form class="upload-form" action="/web/upload" method="post" enctype="multipart/form-data">
-
-    <!-- Custom File Input -->
     <label class="custom-file-upload">
         Datei auswählen
         <input type="file" name="image" required>
     </label>
-
-    <!-- Show selected file name here -->
-    <span id="file-name" style="margin-left:10px; font-style: italic;"></span>
-
+    <span id="file-name" style="margin-left:10px; font-style:italic;"></span>
     <input type="text" name="description" placeholder="Enter description" required>
     <button type="submit">Upload Image</button>
 </form>
 
-
-<!-- Uploaded Images -->
 <div class="images-grid" th:if="${!images.isEmpty()}">
     <div class="image-card" th:each="image : ${images}">
         <img th:src="@{/web/image/{id}(id=${image.id})}" alt="Image">
         <p th:text="${image.description}">Description</p>
+
+        <!-- Comments -->
+        <div class="comments">
+            <h4>Kommentare:</h4>
+            <div th:each="comment : ${image.comments}">
+                <p><strong th:text="${comment.author}">Author</strong>: <span th:text="${comment.text}">Comment text</span></p>
+            </div>
+
+            <!-- Add new comment -->
+            <form th:action="@{/web/comment/{imageId}(imageId=${image.id})}" method="post" style="margin-top:10px;">
+                <input type="text" name="author" placeholder="Name (optional)" style="padding:5px; width:30%;">
+                <input type="text" name="text" placeholder="Kommentar" required style="padding:5px; width:50%;">
+                <button type="submit" style="padding:5px 10px; background-color:#44bd32; color:white; border:none; border-radius:5px; cursor:pointer;">Kommentieren</button>
+            </form>
+        </div>
     </div>
 </div>
 
-<p th:if="${images.isEmpty()}" style="text-align:center; color: #888;">No images uploaded yet.</p>
+<p th:if="${images.isEmpty()}" style="text-align:center; color:#888;">No images uploaded yet.</p>
 
 <script>
     document.querySelector('input[type="file"]').addEventListener('change', function() {

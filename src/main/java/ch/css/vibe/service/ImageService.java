@@ -22,7 +22,6 @@ public class ImageService {
         image.setContentType(file.getContentType());
         image.setDescription(description);
         image.setData(file.getBytes());
-
         return imageRepository.save(image);
     }
 
