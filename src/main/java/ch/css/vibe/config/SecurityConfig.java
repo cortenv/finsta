@@ -21,9 +21,17 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/auth/**", "/h2-console/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/auth/register",
+                                "/auth/login",
+                                "/css/**",
+                                "/images/**"
+                        ).permitAll()
+                        .requestMatchers("/web/**").authenticated()
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/web/", true)

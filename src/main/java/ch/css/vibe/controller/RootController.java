@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class RootController {
 
     @GetMapping("/")
-    public String rootRedirect() {
-        // Redirect the default "/" to the register page
+    public String root() {
         return "redirect:/auth/register";
     }
 }

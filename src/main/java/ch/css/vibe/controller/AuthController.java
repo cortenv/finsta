@@ -16,33 +16,41 @@ public class AuthController {
         this.userService = userService;
     }
 
+    // REGISTER PAGE
     @GetMapping("/register")
     public String showRegister() {
         return "register";
     }
 
+    // REGISTER ACTION
     @PostMapping("/register")
     public String register(
             @RequestParam String username,
             @RequestParam String password,
-            @RequestParam MultipartFile profileImage,
+            @RequestParam(required = false) MultipartFile profileImage,
             Model model
-    ) throws Exception {
-
+    ) {
         try {
-            userService.register(
-                    username,
-                    password,
-                    profileImage.getBytes(),
-                    profileImage.getContentType()
-            );
-            return "redirect:/auth/login";
-        } catch (RuntimeException e) {
+            byte[] imageBytes = null;
+            String imageType = null;
+
+            if (profileImage != null && !profileImage.isEmpty()) {
+                imageBytes = profileImage.getBytes();
+                imageType = profileImage.getContentType();
+            }
+
+            userService.register(username, password, imageBytes, imageType);
+
+            // ✅ Redirect after successful register
+            return "redirect:/web/";
+
+        } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             return "register";
         }
     }
 
+    // LOGIN PAGE
     @GetMapping("/login")
     public String login() {
         return "login";

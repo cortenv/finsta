@@ -15,13 +15,11 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/user/{id}/image")
-    @ResponseBody
+    @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getProfileImage(@PathVariable String id) {
 
         User user = userRepository.findById(id).orElseThrow();
 
-        // ✅ ADD THIS BLOCK HERE
         if (user.getProfileImage() == null) {
             return ResponseEntity.notFound().build();
         }
@@ -30,5 +28,4 @@ public class UserController {
                 .header("Content-Type", user.getProfileImageType())
                 .body(user.getProfileImage());
     }
-
 }
