@@ -21,7 +21,8 @@ public class WebController {
     private final ImageRepository imageRepository;
     private final CommentRepository commentRepository;
 
-    public WebController(ImageService imageService, ImageRepository imageRepository,
+    public WebController(ImageService imageService,
+                         ImageRepository imageRepository,
                          CommentRepository commentRepository) {
         this.imageService = imageService;
         this.imageRepository = imageRepository;
@@ -31,8 +32,9 @@ public class WebController {
     @GetMapping("/")
     public String home(Model model) {
         List<ImageEntity> images = imageRepository.findAll();
-        // Attach comments to each image
-        images.forEach(img -> img.setComments(commentRepository.findByImageOrderByIdAsc(img)));
+        for (ImageEntity image : images) {
+            image.setComments(commentRepository.findByImageId(image.getId()));
+        }
         model.addAttribute("images", images);
         return "index";
     }
@@ -46,17 +48,15 @@ public class WebController {
 
     @GetMapping("/image/{id}")
     @ResponseBody
-    public byte[] getImage(@PathVariable Long id) {
+    public byte[] getImage(@PathVariable String id) {
         return imageService.getImage(id).getData();
     }
 
     @PostMapping("/comment/{imageId}")
-    public String addComment(@PathVariable Long imageId,
+    public String addComment(@PathVariable String imageId,
                              @RequestParam("text") String text,
                              @RequestParam(value = "author", defaultValue = "Anonymous") String author) {
-        ImageEntity image = imageRepository.findById(imageId)
-                .orElseThrow(() -> new RuntimeException("Image not found"));
-        Comment comment = new Comment(image, text, author);
+        Comment comment = new Comment(imageId, text, author);
         commentRepository.save(comment);
         return "redirect:/web/";
     }

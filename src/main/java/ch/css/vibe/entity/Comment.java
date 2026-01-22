@@ -1,36 +1,31 @@
 package ch.css.vibe.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document(collection = "comments")
 public class Comment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "image_id")
-    private ImageEntity image;
-
-    @Column(length = 500)
+    private String imageId;
     private String text;
-
     private String author;
 
     public Comment() {}
 
-    public Comment(ImageEntity image, String text, String author) {
-        this.image = image;
+    public Comment(String imageId, String text, String author) {
+        this.imageId = imageId;
         this.text = text;
         this.author = author;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public ImageEntity getImage() { return image; }
-    public void setImage(ImageEntity image) { this.image = image; }
+    public String getImageId() { return imageId; }
+    public void setImageId(String imageId) { this.imageId = imageId; }
 
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }

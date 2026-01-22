@@ -19,20 +19,21 @@
 
         /* Images grid */
         .images-grid {
-            max-width: 900px;  /* Adjust as needed */
-            margin: 0 auto;    /* Center container */
+            max-width: 900px;
+            margin: 0 auto;
             display: grid;
             gap: 25px;
             justify-content: center;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
 
-
-        .image-card img {
-            width: 100%;
-            aspect-ratio: 4 / 3;
-            object-fit: cover;
-            display: block;
+        .image-card {
+            background:#fff;
+            border-radius:15px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.1);
+            overflow:hidden;
+            text-align:center;
+            transition: transform 0.2s;
         }
         .image-card:hover { transform:translateY(-5px); box-shadow:0 8px 25px rgba(0,0,0,0.15);}
         .image-card img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; }
@@ -47,6 +48,7 @@
 
 <h1>Vibe Image Upload</h1>
 
+<!-- Upload Form -->
 <form class="upload-form" action="/web/upload" method="post" enctype="multipart/form-data">
     <label class="custom-file-upload">
         Datei auswählen
@@ -57,19 +59,20 @@
     <button type="submit">Upload Image</button>
 </form>
 
-<div class="images-grid" th:if="${!images.isEmpty()}">
+<!-- Images Grid -->
+<div class="images-grid" th:if="${images}">
     <div class="image-card" th:each="image : ${images}">
         <img th:src="@{/web/image/{id}(id=${image.id})}" alt="Image">
-        <p th:text="${image.description}">Description</p>
+        <p th:text="${image.description}"></p>
 
-        <!-- Comments -->
-        <div class="comments">
+        <!-- Comments Section -->
+        <div class="comments" th:if="${image.comments}">
             <h4>Kommentare:</h4>
             <div th:each="comment : ${image.comments}">
-                <p><strong th:text="${comment.author}">Author</strong>: <span th:text="${comment.text}">Comment text</span></p>
+                <p><strong th:text="${comment.author}"></strong>: <span th:text="${comment.text}"></span></p>
             </div>
 
-            <!-- Add new comment -->
+            <!-- Add New Comment -->
             <form th:action="@{/web/comment/{imageId}(imageId=${image.id})}" method="post" style="margin-top:10px;">
                 <input type="text" name="author" placeholder="Name (optional)" style="padding:5px; width:30%;">
                 <input type="text" name="text" placeholder="Kommentar" required style="padding:5px; width:50%;">
@@ -79,9 +82,11 @@
     </div>
 </div>
 
-<p th:if="${images.isEmpty()}" style="text-align:center; color:#888;">No images uploaded yet.</p>
+<!-- Fallback message if no images -->
+<p th:if="${images == null or #lists.isEmpty(images) or images.size() == 0}" style="text-align:center; color:#888;">No images uploaded yet.</p>
 
 <script>
+    // Show selected file name
     document.querySelector('input[type="file"]').addEventListener('change', function() {
         document.getElementById('file-name').textContent = this.files[0].name;
     });

@@ -1,11 +1,10 @@
 package ch.css.vibe.repository;
 
 import ch.css.vibe.entity.Comment;
-import ch.css.vibe.entity.ImageEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByImageOrderByIdAsc(ImageEntity image);
+public interface CommentRepository extends MongoRepository<Comment, String> {
+    List<Comment> findByImageId(String imageId);
 }

@@ -19,18 +19,19 @@ public class ImageController {
         this.imageService = imageService;
     }
 
+    // Upload image
     @PostMapping("/upload")
-    public ResponseEntity<Long> uploadImage(
+    public ResponseEntity<String> uploadImage(
             @RequestParam("image") MultipartFile image,
             @RequestParam("description") String description
     ) throws IOException {
-
         ImageEntity savedImage = imageService.saveImage(image, description);
-        return ResponseEntity.ok(savedImage.getId());
+        return ResponseEntity.ok(savedImage.getId()); // return String ID
     }
 
+    // Get image by ID
     @GetMapping("/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+    public ResponseEntity<byte[]> getImage(@PathVariable String id) {
         ImageEntity image = imageService.getImage(id);
 
         return ResponseEntity.ok()
@@ -39,4 +40,18 @@ public class ImageController {
                 .header(HttpHeaders.CONTENT_TYPE, image.getContentType())
                 .body(image.getData());
     }
+
+    // Add comment
+    @PostMapping("/{id}/comment")
+    public ResponseEntity<String> addComment(
+            @PathVariable String id,
+            @RequestParam String text,
+            @RequestParam(defaultValue = "Anonymous") String author
+    ) {
+        // Correct constructor: imageId, text, author
+        ch.css.vibe.entity.Comment comment = new ch.css.vibe.entity.Comment(id, text, author);
+        imageService.addComment(id, comment);
+        return ResponseEntity.ok("Comment added");
+    }
+
 }
