@@ -63,12 +63,6 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-		<!-- MongoDB -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
-		</dependency>
-
 		<!-- Thymeleaf security extras -->
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
