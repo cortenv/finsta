@@ -1,9 +1,9 @@
 package ch.css.vibe.config;
 
+import ch.css.vibe.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,34 +23,25 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/auth/register",
-                                "/auth/login",
-                                "/css/**",
-                                "/images/**"
-                        ).permitAll()
+                        .requestMatchers("/", "/auth/register", "/auth/login", "/css/**", "/images/**").permitAll()
                         .requestMatchers("/web/**").authenticated()
                         .anyRequest().authenticated()
                 )
-
                 .formLogin(form -> form
-                        .loginPage("/auth/login")          // match your controller
-                        .defaultSuccessUrl("/web/", true)  // always go here after login
+                        .loginPage("/auth/login")
+                        .defaultSuccessUrl("/web/", true) // redirect to /web/ after login
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/auth/login")  // optional
+                        .logoutSuccessUrl("/auth/login")
                 );
-
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }
