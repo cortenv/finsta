@@ -21,16 +21,19 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/h2-console/**", "/web/**").permitAll()
+                        .requestMatchers("/", "/auth/**", "/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/auth/login")
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/web/", true)
                         .permitAll()
                 )
-                .logout(Customizer.withDefaults());
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/auth/login")
+                );
 
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable())); // H2/Mongo console frames
+        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }

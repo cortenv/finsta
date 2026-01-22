@@ -1,6 +1,5 @@
 package ch.css.vibe.controller;
 
-import ch.css.vibe.entity.User;
 import ch.css.vibe.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,20 +17,17 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String showRegisterForm(Model model) {
+    public String showRegister() {
         return "register";
     }
 
     @PostMapping("/register")
-    public String register(@RequestParam String username,
-                           @RequestParam String password,
-                           @RequestParam MultipartFile profileImage,
-                           Model model) throws Exception {
-
-        if (profileImage.isEmpty()) {
-            model.addAttribute("error", "Please select a profile picture");
-            return "register";
-        }
+    public String register(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam MultipartFile profileImage,
+            Model model
+    ) throws Exception {
 
         try {
             userService.register(
@@ -40,7 +36,7 @@ public class AuthController {
                     profileImage.getBytes(),
                     profileImage.getContentType()
             );
-            return "redirect:/auth/login"; // only redirect on success
+            return "redirect:/auth/login";
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             return "register";
@@ -48,33 +44,7 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public String showLoginForm() {
+    public String login() {
         return "login";
-    }
-
-    @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password,
-                        Model model) {
-        try {
-            User user = userService.login(username, password);
-            model.addAttribute("user", user);
-            return "redirect:/web/";
-        } catch (RuntimeException e) {
-            model.addAttribute("error", "Invalid credentials");
-            return "login";
-        }
-    }
-
-    @GetMapping("/user/{id}/image")
-    @ResponseBody
-    public org.springframework.http.ResponseEntity<byte[]> getProfileImage(@PathVariable String id) {
-        User user = userService.findById(id);
-        if (user.getProfileImage() == null) {
-            return org.springframework.http.ResponseEntity.notFound().build();
-        }
-        return org.springframework.http.ResponseEntity.ok()
-                .header("Content-Type", user.getProfileImageType())
-                .body(user.getProfileImage());
     }
 }
