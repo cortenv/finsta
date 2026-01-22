@@ -2,48 +2,50 @@ package ch.css.vibe.service;
 
 import ch.css.vibe.entity.Comment;
 import ch.css.vibe.entity.ImageEntity;
+import ch.css.vibe.entity.User;
 import ch.css.vibe.repository.ImageRepository;
+import ch.css.vibe.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ImageService {
 
     private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
-    public ImageService(ImageRepository imageRepository) {
+    public ImageService(ImageRepository imageRepository, UserRepository userRepository) {
         this.imageRepository = imageRepository;
+        this.userRepository = userRepository;
     }
 
-    public ImageEntity saveImage(MultipartFile file, String description) throws IOException {
+    // Save image with user
+    public ImageEntity saveImage(MultipartFile file, String description, String userId) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         ImageEntity image = new ImageEntity();
         image.setDescription(description);
         image.setData(file.getBytes());
-        image.setContentType(file.getContentType());
         image.setFileName(file.getOriginalFilename());
-        image.setComments(new ArrayList<>());
+        image.setContentType(file.getContentType());
+        image.setUserId(user.getId());       // userId is String
+        image.setUsername(user.getUsername());
+
         return imageRepository.save(image);
     }
 
+    // Get image by DB ID (Long)
     public ImageEntity getImage(String id) {
         return imageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Image not found"));
+                .orElseThrow(() -> new RuntimeException("Image not found: " + id));
     }
 
-    public List<ImageEntity> getAllImages() {
-        return imageRepository.findAll();
-    }
-
-    public ImageEntity addComment(String imageId, Comment comment) {
+    public void addComment(String imageId, Comment comment) {
         ImageEntity image = getImage(imageId);
-        if (image.getComments() == null) {
-            image.setComments(new ArrayList<>());
-        }
         image.getComments().add(comment);
-        return imageRepository.save(image);
+        imageRepository.save(image);
     }
 }

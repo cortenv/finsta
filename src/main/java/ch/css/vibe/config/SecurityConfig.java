@@ -2,7 +2,9 @@ package ch.css.vibe.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,16 +35,22 @@ public class SecurityConfig {
                 )
 
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/web/", true)
+                        .loginPage("/auth/login")          // match your controller
+                        .defaultSuccessUrl("/web/", true)  // always go here after login
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/auth/login")
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/auth/login")  // optional
                 );
 
         http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

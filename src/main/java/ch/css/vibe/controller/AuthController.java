@@ -1,19 +1,29 @@
 package ch.css.vibe.controller;
 
 import ch.css.vibe.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
 
     private final UserService userService;
+    private final AuthenticationManager authManager; // NEW
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, AuthenticationManager authManager) {
         this.userService = userService;
+        this.authManager = authManager;
     }
 
     // REGISTER PAGE
@@ -39,9 +49,16 @@ public class AuthController {
                 imageType = profileImage.getContentType();
             }
 
+            // 1️⃣ Create user
             userService.register(username, password, imageBytes, imageType);
 
-            // ✅ Redirect after successful register
+            // 2️⃣ Auto-login user
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(username, password);
+            var auth = authManager.authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            // 3️⃣ Redirect to web
             return "redirect:/web/";
 
         } catch (Exception e) {
@@ -50,9 +67,10 @@ public class AuthController {
         }
     }
 
+
     // LOGIN PAGE
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "login"; // This is /auth/login
     }
 }
